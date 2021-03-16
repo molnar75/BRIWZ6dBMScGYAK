@@ -1,0 +1,100 @@
+//1.a
+
+for $d in fn:doc("ovoda.xml") //dolgozo
+where $d/beosztas="óvónő"
+order by $d/nev
+return $d
+
+//1.b
+
+for $cs in fn:doc("ovoda.xml")//csoport
+where $cs/@nev = 'süni'
+return 
+    element {"sünicsoport"} {
+        text {$cs/gyerek/nev}
+    }
+
+//1.c
+
+for $d in fn:doc("ovoda.xml")//dolgozo
+where $d/beosztas="dadus" and $d/szuletesiev=min(//szuletesiev)
+return 
+    <legidősebbdadus>
+        {$d/nev}
+        {$d/szuletesiev}
+    </legidősebbdadus>
+
+//1.d
+
+for $d in fn:doc("ovoda.xml")//dolgozo
+where $d/beosztas="óvónő" and $d/szuletesiev=max(//dolgozo/szuletesiev)
+return 
+    <legfiatalabbóvónő>
+        {$d/nev}
+        {$d/szuletesiev}
+    </legfiatalabbóvónő>
+
+//1.e
+
+let $gy := fn:doc("ovoda.xml")//csoport[@nev="maci"]
+return
+update insert 
+    <gyerek jel="traktor">
+        <nev>Benőke</nev>
+        <szuletesiev>2018</szuletesiev>
+    </gyerek>
+into $gy
+
+//1.f
+
+let $gy := fn:doc("ovoda.xml")//gyerek
+return
+update value //nev [.="Benőke"] with "Benedek"
+
+//1.g
+
+let $gy := fn:doc("ovoda.xml")//gyerek[@jel = "traktor"]
+
+return
+    update delete $gy
+
+//1.h
+
+for $n in fn:doc("ovoda.xml")//gyerek
+where $n/@jel="napocska"
+return 
+    element {"eredmény"} {
+        attribute {"jel"} {$n/@jel},
+        text {$n/nev}
+    }
+
+//1.i
+
+declare namespace fv ="f1";
+declare function fv:eletkor ($s) as xs:integer{
+    let $e := fn:year-from-date(fn:current-date()) - $s cast as xs:integer
+    return $e
+};
+
+<eredmeny>
+{
+    let $doc := fn:doc("ovoda.xml")
+    for $gy in $doc//gyerek
+    return
+        element {"gyerek"} {
+        attribute {"jel"} {$gy/@jel},
+        attribute {"név"} {$gy/nev},
+        text {fv:eletkor(number($gy/szuletesiev))}
+    }
+}
+</eredmeny>
+
+//1.j
+
+for $cs in fn:doc("ovoda.xml")//csoport
+return 
+    element {"létszám"} {
+        attribute {"csoport"} {$cs/@nev},
+        text {count($cs/gyerek)}
+    }
+    

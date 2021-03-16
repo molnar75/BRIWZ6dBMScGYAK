@@ -1,0 +1,106 @@
+//2.a
+
+for $f in fn:doc("mozi.xml")//film
+where $f/ev < 2000
+order by $f/cim
+return $f/cim
+
+//2.b
+
+let $jatekido := fn:doc("mozi.xml")//jatekido
+let $atlag:=avg($jatekido)
+
+return
+    <eredmeny>
+        {$atlag}     
+    </eredmeny>
+
+//2.c
+
+let $doc := fn:doc("mozi.xml")
+for $kategoria in distinct-values($doc//film/kategoria)
+order by $kategoria
+return $kategoria
+
+(: 
+for $kategoria in fn:doc("mozi.xml")//kategoria
+group by $kategoria
+return $kategoria
+:)
+
+//2.d
+
+let $doc := fn:doc("mozi.xml")
+for $k in distinct-values($doc//film/kategoria)
+return
+    element {"eredmény"} {
+        attribute {"kategória"} {$k},
+        text {count($doc//film[kategoria eq $k])}
+    }
+
+//2.e
+
+for $f in fn:doc("mozi.xml")//film
+where $f/imbd = max(//imbd)
+return $f
+
+//2.f
+
+for $f in fn:doc("mozi.xml")//film
+for $r in fn:doc("rendezok.xml")//rendezo
+where $r/@id = $f/rendezo/text()
+return
+    element {"rendezte"} {
+        attribute {"cim"} {$f/cim},
+        text {$r/nev/text()}
+    }
+
+//2.g
+
+let $f := fn:doc("mozi.xml")/mozi
+return
+update insert 
+    <film id="ab7">
+        <cim>A keresztapa</cim>
+        <ev>1972</ev>
+        <kategoria>krimi</kategoria>
+        <kategoria>dráma</kategoria>
+        <jatekido>175</jatekido>
+        <imbd>9.2</imbd>
+    </film>
+    
+into $f
+
+//2.h
+
+let $gy := fn:doc("mozi.xml")//film
+return
+	update value //cim [.="A keresztapa"] with "Keresztapa"
+
+//2.i
+
+let $f := fn:doc("mozi.xml")//film[@id = "ab7"]
+
+return
+    update delete $f
+
+//2.j
+
+declare namespace fv ="f1";
+declare function fv:kor ($s) as xs:integer{
+    let $e := fn:year-from-date(fn:current-date()) - $s cast as xs:integer
+    return $e
+};
+
+<eredmeny>
+{
+    let $doc := fn:doc("mozi.xml")
+    for $f in $doc//film
+    return
+        element {"film"} {
+        attribute {"cím"} {$f/cim},
+        attribute {"megjelenés"} {$f/ev},
+        text {fv:kor(number($f/ev))}
+    }
+}
+</eredmeny>
