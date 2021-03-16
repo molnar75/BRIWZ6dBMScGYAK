@@ -1,0 +1,12 @@
+CREATE DATABASE books;
+
+USE books;
+
+CREATE TABLE books (
+    isbn VARCHAR(50) PRIMARY KEY,
+    title VARCHAR(50),
+    price int
+);
+    
+INSERT INTO books VALUES ('A412', 'A412 könyv címe', 6000);
+INSERT into books VALUES ('A413', 'A413 könyv címe', 5000);
