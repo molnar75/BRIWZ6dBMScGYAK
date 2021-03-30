@@ -1,0 +1,110 @@
+void Main()
+{
+	while(true) {
+		Console.WriteLine();
+		Console.WriteLine("--Menu---");
+		Console.WriteLine("Add new customer (1)");
+		Console.WriteLine("Add new product (2)");
+		Console.WriteLine("Create new order (3)");
+		Console.WriteLine("Delete customer (4)");
+		Console.WriteLine("Delete product (5)");
+		Console.WriteLine("List customers (6)");
+		Console.WriteLine("List products (7)");
+		Console.WriteLine("List orders (8)");
+		Console.WriteLine("Search in products (9)");
+		Console.WriteLine("Find products by customer (10)");
+		Console.WriteLine("Quit (11)");
+		Console.WriteLine();
+		
+		string menuInput = Util.ReadLine("What would you like to do?");
+		
+		switch(menuInput) {
+			case "1" :
+				addNewCustomer();
+				break;
+			case "2":
+				addNewProduct();
+				break;
+			case "3":
+				addNewOrder();
+				break;
+			case "11":
+				Console.WriteLine("Bye.");
+				return;
+			default:
+				Console.WriteLine("Invalid command.");
+				break;
+		}
+	}
+}
+
+void addNewCustomer() {
+	try {
+		Console.WriteLine("Add new customer.");
+		
+		int id = int.Parse(Util.ReadLine("Id:"));
+		string fullName = Util.ReadLine("FullName:");
+		int age = int.Parse(Util.ReadLine("Age:"));
+		
+		Customers customer = new Customers { Id = id, FullName = fullName, Age = age };
+	
+		Customers.InsertOnSubmit(customer);
+		SubmitChanges();
+		
+		Console.WriteLine("Customer successfully created.");
+	} catch(Exception e) {
+		Console.WriteLine("Failed to create customer: " + e.Message);
+	}
+}
+
+void addNewProduct() {
+	try {
+		Console.WriteLine("Add new product.");
+	
+		int id = int.Parse(Util.ReadLine("Id:"));
+		string productName = Util.ReadLine("ProductName:");
+		string category = Util.ReadLine("Category:");
+		int price = int.Parse(Util.ReadLine("Price:"));
+		
+		Products product = new Products {
+			Id = id,
+			ProductName = productName,
+			Category = category,
+			Price = price 
+		};
+		
+		Products.InsertOnSubmit(product);
+		SubmitChanges();
+		
+		Console.WriteLine("Product successfully created.");
+	} catch(Exception e) {
+		Console.WriteLine("Failed to create product: " + e.Message);
+	}
+
+}
+
+void addNewOrder() {
+	try {
+		Console.WriteLine("Create new order.");
+	
+		int orderId = int.Parse(Util.ReadLine("OrderId:"));
+		int customerId = int.Parse(Util.ReadLine("CustomerId:"));
+		string productIdsString = Util.ReadLine("ProductIds(separated by comma):");
+		string[] separatedProductIdsString = productIdsString.Split(',');
+		int[] productIds = Array.ConvertAll(separatedProductIdsString, s => int.Parse(s));
+		
+		Orders order = new Orders { Id = orderId, Customer = customerId };
+		Orders.InsertOnSubmit(order);
+		
+		foreach (int productId in productIds) {
+			Orderproducts orderProduct = new Orderproducts {OrderId = orderId, ProductId = productId};
+			Orderproducts.InsertOnSubmit(orderProduct);
+		}
+		
+		SubmitChanges();
+		
+		Console.WriteLine("Order successfully created.");
+	} catch(Exception e) {
+		Console.WriteLine("Failed to create order: " + e.Message);
+	}
+}
