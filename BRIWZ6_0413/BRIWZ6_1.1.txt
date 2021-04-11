@@ -1,0 +1,25 @@
+//a
+CREATE OR REPLACE TYPE DIAK AS OBJECT (
+    NEV VARCHAR2(30),
+    SZEV INT,
+    SZAK VARCHAR(30)
+);
+
+//b
+CREATE TABLE DIAKOK (DID INT PRIMARY KEY, HALLGATO DIAK);
+
+INSERT INTO DIAKOK VALUES (1, DIAK('Tibi', 2000, 'kereskedelem és marketing'));
+INSERT INTO DIAKOK VALUES (2, DIAK('Bence', 2000, 'kereskedelem és marketing'));
+INSERT INTO DIAKOK VALUES (3, DIAK('Anett', 1996, 'sportszervező'));
+
+//c
+SELECT * FROM DIAKOK; //unsopported type
+
+SELECT DID FROM DIAKOK; //ez így okés
+
+SELECT HALLGATO.NEV FROM DIAKOK; //nem jó, mivel a hallgato az nem maga a tábla
+
+SELECT D.HALLGATO.NEV FROM DIAKOK D;
+
+//d
+UPDATE DIAKOK D SET D.HALLGATO.NEV = 'Tibor' WHERE D.DID = 1;
